@@ -96,6 +96,26 @@ Note that the types that you can save to and restore from a `Bundle` are primiti
 Launch Settings and select Developer options, turn on the setting labeled Don’t keep activities. Now run your app and press the Home button. Pressing Home causes the activity to be paused and stopped. Then the stopped activity will be destroyed just as if the Android OS had reclaimed it for its memory. Then you can restore the app to see if your state was saved as you expected.
 
 
+## Chapter 4: Debugging Android Apps
+If a crash occurs while a device is not plugged in, all is not lost. The device will store the latest lines written to the log. The length and expiration of the stored log depends on the device, but you can usually count on retrieving log results within 10 minutes. Just plug in the device and select your device in the Devices view. LogCat will fill itself with the stored log.
+
+### Logging Stack Traces
+`String Context` and `String Message` are required, you can also pass in a `Throwable` (either other exception or a new one to log a stack trace)
+
+`Log.d( TAG, "Updating question text for question #" + mCurrentIndex, new Exception());`
+
+Logging out stack traces has the advantage that you can see stack traces from multiple places in one log. The downside is that to learn something new you have to add new log statements, rebuild, deploy, and navigate through your app to see what happened. The debugger is more convenient. If you run your app with the debugger attached, then you can set a breakpoint while the application is still running and poke around to get information about multiple issues.
+
+### Android Lint
+Android Lint is a static analyzer for Android code. A static analyzer is a program that examines your code to find defects without running it. Android Lint uses its knowledge of the Android frameworks to look deeper into your code and find problems that the compiler cannot.
+
+Select Analyze → Inspect Code... from the menu bar. You will be asked which parts of your project you would like to inspect. Choose Whole project. Android Studio will now run Lint as well as a few other static analyzers on your code.
+
+
+
+
+
+
 * * * 
 
 ## Glossary
