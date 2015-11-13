@@ -59,6 +59,42 @@ I started late, so you won't see any commits / tags for the first few chapters.
     - eg: `drawable-hdpi`, `drawable-mdpi`, `drawable-xhdpi`, `drawable-xxhdpi` 
 
 
+## Chapter 3: The Activity Lifecycle
+- `onCreate()`, `onStart()`, `onResume()`, `onPause()`, `onStop()`, `onDestroy()`
+- a stopped activity’s survival is not guaranteed. When the system needs to reclaim memory, it will destroy stopped activities.
+- Even if the window only partially covers the activity, the activity is paused and cannot be interacted with. The activity resumes when the pop-up window is dismissed.
+- Android will never destroy a running activity to reclaim memory – the activity must be in the paused or stopped state to be destroyed. If an activity is paused or stopped, then its `onSaveInstanceState(…)` method has been called. 
+- When `onSaveInstanceState(…)` is called, the data is saved to the Bundle object. That Bundle object is then stuffed into your activity’s activity record by the OS.
+- When your activity is stashed, an Activity object does not exist, but the activity record object lives on in the OS. The OS can reanimate the activity using the activity record when it needs to.
+- Under some situations, Android will not only kill your activity but also completely shut down your application’s process. This will only happen if the user is not currently looking at your application, but it can (and does) happen. Even in this case, the activity record will live on and enable a quick restart of your activity if the user returns.
+- When the user presses the Back button, your activity really gets destroyed, once and for all. At that point, your activity record is discarded. Activity records are also typically discarded on reboot and may also be discarded if they are not used for a long time.
+
+
+
+### Logging
+`android.util.Log` class sends log messages to a shared system-level log.
+
+| Log Level | Method |
+| --------- | ------ | 
+| ERROR | Log.e(...) | 
+| WARNING | Log.w(...) | 
+| INFO | Log.i(...) | 
+| DEBUG | Log.d(...) | 
+| VERBOSE | Log.v(...) | 
+
+
+### Device Configurations
+- Rotating the device changes the `device configuration`. The device configuration is a set of characteristics that describe the current state of an individual device. The characteristics that make up the configuration include screen orientation, screen density, screen size, keyboard type, dock mode, language, and more.
+- When the device is in landscape orientation, Android will find and use resources in the `res/layout-land` directory. Otherwise, it will stick with the default in `res/layout/`.
+- `FrameLayout` is the simplest `ViewGroup` and does not arrange its children in any particular manner.
+- You can override `onSaveInstanceState(…)` to save additional data to the bundle and then read that data back in `onCreate(…)`.
+
+### Bundle
+Note that the types that you can save to and restore from a `Bundle` are primitive types and classes that implement the `Serializable` or `Parcelable` interfaces. It is usually a bad practice to put objects of custom types into a Bundle, however, because the data might be stale when you get it back out. It is a better choice to use some other kind of storage for the data and put a primitive identifier into the Bundle instead.
+
+### Testing onSaveInstanceState
+Launch Settings and select Developer options, turn on the setting labeled Don’t keep activities. Now run your app and press the Home button. Pressing Home causes the activity to be paused and stopped. Then the stopped activity will be destroyed just as if the Android OS had reclaimed it for its memory. Then you can restore the app to see if your state was saved as you expected.
+
 
 * * * 
 
@@ -71,3 +107,4 @@ I started late, so you won't see any commits / tags for the first few chapters.
 | **layout** | A layout defines a set of user interface objects and their position on the screen. A layout is made up of definitions written in XML. Each definition is used to create an object that appears on screen, like a button or some text. |
 | **toast** | A *toast* is a short message that informs the user of something but does not require any input or action. |
 | **widget** | Widgets are the building blocks you use to compose a user interface. A widget can show text or graphics, interact with the user, or arrange other widgets on the screen. |
+| **FrameLayout** | FrameLayout is the simplest ViewGroup and does not arrange its children in any particular manner. |
