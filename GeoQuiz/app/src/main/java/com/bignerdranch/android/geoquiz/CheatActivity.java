@@ -20,6 +20,7 @@ public class CheatActivity extends AppCompatActivity {
 
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
+    private TextView mAPILvelTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +31,9 @@ public class CheatActivity extends AppCompatActivity {
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
         // set up listeners
-        mAnswerTextView = (TextView)findViewById(R.id.answer_text_view);
+        mAnswerTextView = (TextView) findViewById(R.id.answer_text_view);
         mShowAnswerButton = (Button) findViewById(R.id.show_answer_button);
+        mAPILvelTextView = (TextView) findViewById(R.id.api_level_text_view);
 
         mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +42,9 @@ public class CheatActivity extends AppCompatActivity {
                 showActivityAnimation();
             }
         });
+
+        // set API level
+        mAPILvelTextView.setText("API Level " + Build.VERSION.SDK_INT);
     }
 
     private void showAnswer() {
