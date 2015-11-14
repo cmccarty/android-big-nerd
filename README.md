@@ -152,6 +152,21 @@ An activity may be started from several different places, so you should define k
     - Launcher activity status is specified in the manifest by the `intent-filter` element in QuizActivity’s declaration
 - A call to `Activity.finish()` in CheatActivity would also pop the CheatActivity off the stack.
 
+
+## Chapter 6: Android SDK Versions and Compatibility
+Current Platform usage dashboard: [http://developer.android.com/about/dashboards/index.html](http://developer.android.com/about/dashboards/index.html)
+
+- The `minSdkVersion` value is a hard floor below which the OS should refuse to install the app.
+- The `targetSdkVersion` value tells Android which API level your app was designed to run on. Most often this will be the latest Android release.
+- The `compileSdkVersion`, or build target, specifies which version to use when building your own code.
+
+Thanks to improvements in Android Lint, potential problems caused by calling newer code on older devices can be caught at compile time. If you use code from a higher version than your minimum SDK, Android Lint will report build errors.
+
+The `Build.VERSION.SDK_INT` constant is the device’s version of Android. You then compare that version with the constant that stands for the Lollipop release. 
+
+Version codes are listed at [http://developer.android.com/reference/android/os/Build.VERSION_CODES.html](http://developer.android.com/reference/android/os/Build.VERSION_CODES.html).
+
+
 * * * 
 
 ## Glossary
