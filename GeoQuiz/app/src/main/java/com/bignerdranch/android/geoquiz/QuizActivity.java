@@ -21,6 +21,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEATING_HISTORY = "cheating_history";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
@@ -38,6 +39,9 @@ public class QuizActivity extends AppCompatActivity {
         new Question(R.string.question_americas, true),
         new Question(R.string.question_asia, true),
     };
+
+    // track cheating
+    private boolean[] mCheatingHistory = new boolean[mQuestionBank.length];
 
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
@@ -59,6 +63,13 @@ public class QuizActivity extends AppCompatActivity {
         // recover saved instance state
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX);
+            mCheatingHistory = savedInstanceState.getBooleanArray(KEY_CHEATING_HISTORY);
+        } else {
+            // initialize cheating history
+            for (int i = 0; i < mQuestionBank.length; i++) {
+                mCheatingHistory[i] = false; // initialize all to false
+
+            }
         }
 
         updateQuestion();
@@ -121,7 +132,11 @@ public class QuizActivity extends AppCompatActivity {
                 return;
             }
 
-            mIsCheater = CheatActivity.wasAnswerShown(data);
+            boolean cheated = CheatActivity.wasAnswerShown(data);
+            if (cheated) {
+                mCheatingHistory[mCurrentIndex] = true;
+                mIsCheater = true;
+            }
         }
     }
 
@@ -130,6 +145,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+        savedInstanceState.putBooleanArray(KEY_CHEATING_HISTORY, mCheatingHistory);
     }
 
     // other livecycle overrides to test logging
@@ -189,7 +205,6 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void updateQuestion() {
-        mIsCheater = false;
         Question currentQuestion = getCurrentQuestion();
         int questionResId = currentQuestion.getTextResId();
         mQuestionTextView.setText(questionResId);
@@ -212,7 +227,7 @@ public class QuizActivity extends AppCompatActivity {
 
         int messsageResId = 0;
 
-        if (mIsCheater) {
+        if (cheatedOnQuestion(mCurrentIndex)) {
             messsageResId = R.string.judgement_toast;
         } else {
             if (userPressedTrue == answerIsTrue) {
@@ -224,6 +239,14 @@ public class QuizActivity extends AppCompatActivity {
 
         // present toast
         Toast.makeText(this, messsageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean cheatedOnQuestion(int questionIndex) {
+        if (questionIndex > mCheatingHistory.length) {
+            return false;
+        }
+
+        return mCheatingHistory[questionIndex];
     }
 
     private Question getCurrentQuestion() {
