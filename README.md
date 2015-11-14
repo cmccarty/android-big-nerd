@@ -112,9 +112,45 @@ Android Lint is a static analyzer for Android code. A static analyzer is a progr
 Select Analyze → Inspect Code... from the menu bar. You will be asked which parts of your project you would like to inspect. Choose Whole project. Android Studio will now run Lint as well as a few other static analyzers on your code.
 
 
+## Chapter 5: Your Second Activity
+Creating an activity typically involves touching at least three files: the Java class file, an XML layout, and the application manifest.
 
+Notice the special XML namespace for `tools` and the `tools:text` attribute on the `TextView` widget where the answer will appear. This namespace allows you to override any attribute on a widget for the purpose of displaying it differently in the Android Studio preview. Since TextView has a `text` attribute, you can provide a literal dummy value for it to help you know what it will look like at runtime.
 
+The `manifest` is an XML file containing metadata that describes your application to the Android OS. The file is always named `AndroidManifest.xml`, and it lives in the `app/manifests` directory of your project. Every activity in an application must be declared in the manifest so that the OS can access it.
 
+### Starting an Activity
+The simplest way one activity can start another is with the Activity method: `public void startActivity(Intent intent)` 
+
+You might guess that `startActivity(…)` is a static method that you call on the `Activity` subclass that you want to start. But it is not. When an activity calls `startActivity(…)`, this call is sent to the OS. In particular, it is sent to a part of the OS called the `ActivityManager`. The `ActivityManager` then creates the Activity instance and calls its `onCreate(…)` method.
+
+An activity may be started from several different places, so you should define keys for extras on the activities that retrieve and use them. **Using your package name as a qualifier for your extra** prevents name collisions with extras from other apps.
+
+### Communicating with intents
+- An `intent` is an object that a component can use to communicate with the OS. The only components you have seen so far are `activities`, but there are also `services`, `broadcast receivers`, and `content providers`. Intents are multi-purpose communication tools, and the Intent class provides different constructors depending on what you are using the intent to do.
+    - The `Class` argument specifies the activity class that the ActivityManager should start. 
+    - The `Context` argument tells the ActivityManager which application package the activity class can be found in.
+- When you create an Intent with a Context and a Class object, you are creating an `explicit` intent. You use explicit intents to start activities within your application.
+- When an activity in your application wants to start an activity in another application, you create an `implicit` intent.
+- `Extras` are arbitrary data that the calling activity can include with an intent.
+    - `public Intent putExtra( String name, boolean value)`
+    - It returns the `Intent` itself, so you can chain multiple calls if you need to.
+- Using a `newIntent(…)` method like this for your activity subclasses will make it easy for other code to properly configure their launching intents.
+- When you want to hear back from the child activity, you call the following Activity method: `public void startActivityForResult( Intent intent, int requestCode)`
+    - The `request code` is a user-defined integer that is sent to the child activity and then received back by the parent. It is used when an activity starts more than one type of child activity and needs to know who is reporting back.
+    
+#### Setting a result
+- There are two methods you can call in the child activity to send data back to the parent:   
+    - `public final void setResult(int resultCode)` 
+    - `public final void setResult(int resultCode, Intent data)`
+- Then, when the user presses the Back button, the ActivityManager calls the following method on the parent activity:   
+    - `protected void onActivityResult( int requestCode, int resultCode, Intent data)`
+
+### How Android Sees Your Activities
+- the `ActivityManager` maintains a `back stack` and that this back stack is not just for your application’s activities. Activities for all applications share the back stack, which is one reason the ActivityManager is involved in starting your activities and lives with the OS and not your application. The stack represents the use of the OS and device as a whole rather than the use of a single application.
+- When you click on the GeoQuiz app in the launcher, the OS does not start the application; it starts an activity in the application. More specifically, it starts the application’s `launcher activity`.
+    - Launcher activity status is specified in the manifest by the `intent-filter` element in QuizActivity’s declaration
+- A call to `Activity.finish()` in CheatActivity would also pop the CheatActivity off the stack.
 
 * * * 
 
@@ -124,7 +160,10 @@ Select Analyze → Inspect Code... from the menu bar. You will be asked which pa
 | Term | Info |
 | ---- | ---- |
 | **activity** | An activity is an instance of Activity, a class in the Android SDK. An activity is responsible for managing user interaction with a screen of information. |
+| **extra** | `Extras` are arbitrary data that the calling activity can include with an intent |
+| **intent** | An `intent` is an object that a component can use to communicate with the OS. Intents are multi-purpose communication tools, and the Intent class provides different constructors depending on what you are using the intent to do. |
 | **layout** | A layout defines a set of user interface objects and their position on the screen. A layout is made up of definitions written in XML. Each definition is used to create an object that appears on screen, like a button or some text. |
+| **manifest** | The `manifest` is an XML file containing metadata that describes your application to the Android OS. The file is always named `AndroidManifest.xml`, and it lives in the `app/manifests` directory of your project. |
 | **toast** | A *toast* is a short message that informs the user of something but does not require any input or action. |
 | **widget** | Widgets are the building blocks you use to compose a user interface. A widget can show text or graphics, interact with the user, or arrange other widgets on the screen. |
 | **FrameLayout** | FrameLayout is the simplest ViewGroup and does not arrange its children in any particular manner. |
