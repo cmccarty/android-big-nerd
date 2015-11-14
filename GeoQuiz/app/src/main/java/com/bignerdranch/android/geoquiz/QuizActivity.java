@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -38,6 +40,7 @@ public class QuizActivity extends AppCompatActivity {
     };
 
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +111,21 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
@@ -171,6 +189,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void updateQuestion() {
+        mIsCheater = false;
         Question currentQuestion = getCurrentQuestion();
         int questionResId = currentQuestion.getTextResId();
         mQuestionTextView.setText(questionResId);
@@ -192,10 +211,15 @@ public class QuizActivity extends AppCompatActivity {
         boolean answerIsTrue = currentQuestion.isAnswerTrue();
 
         int messsageResId = 0;
-        if (userPressedTrue == answerIsTrue) {
-            messsageResId = R.string.correct_toast;
+
+        if (mIsCheater) {
+            messsageResId = R.string.judgement_toast;
         } else {
-            messsageResId = R.string.incorrect_toast;
+            if (userPressedTrue == answerIsTrue) {
+                messsageResId = R.string.correct_toast;
+            } else {
+                messsageResId = R.string.incorrect_toast;
+            }
         }
 
         // present toast
@@ -207,7 +231,9 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void cheat() {
-        Intent i = new Intent(QuizActivity.this, CheatActivity.class);
-        startActivity(i);
+        Question currentQuestion = getCurrentQuestion();
+        boolean answerIsTrue = currentQuestion.isAnswerTrue();
+        Intent i = CheatActivity.newIntent(QuizActivity.this, answerIsTrue);
+        startActivityForResult(i, REQUEST_CODE_CHEAT);
     }
 }
