@@ -27,6 +27,7 @@ I started late, so you won't see any commits / tags for the first few chapters.
 - [Chapter 5: Your Second Activity](#chapter-5-your-second-activity)
 - [Chapter 6: Android SDK Versions and Compatibility](#chapter-6-android-sdk-versions-and-compatibility)
 - [Chapter 7: UI Fragments and the Fragment Manager](#chapter-7-ui-fragments-and-the-fragment-manager)
+- [Chapter 8: Creating User Interfaces with Layouts and Widgets](#chapter-8-creating-user-interfaces-with-layouts-and-widgets)
 - [Glossary](#glossary)
 
 
@@ -229,6 +230,36 @@ For now, think of hosting as the activity providing a spot in its view hierarchy
 - **A good rule of thumb is to have no more than two or three fragments on the screen at a time**
 
 
+## Chapter 8: Creating User Interfaces with Layouts and Widgets
+### Styles, themes, and theme attributes
+- A `style` is an XML resource that contains attributes that describe how a widget should look and behave. You can create your own styles. You add them to a styles file in `res/values/` and refer to them in layouts like this: `@style/my_own_style`.
+- A `theme` is a collection of styles. Structurally, a theme is itself a style resource whose attributes point to other style resources. You can apply a style from the app’s theme to a widget using a `theme attribute reference`.
+
+### Screen pixel densities and dp and sp
+Android design guidelines: [http://developer.android.com/design/index.html](http://developer.android.com/design/index.html)
+
+| type | Description |
+| ---- | ----------- |
+| `dp` | Short for density-independent pixel and usually pronounced “dip.” You typically use this for margins, padding, or anything else for which you would otherwise specify size with a pixel value. When your display is a higher density, density-independent pixels will expand to fill a larger number of screen pixels. One dp is always 1/ 160th of an inch on a device’s screen. You get the same size regardless of screen density. |
+| `sp` | Short for scale-independent pixel. Scale-independent pixels are density-independent pixels that also take into account the user’s font size preference. You will almost always use sp to set display text size. |
+| `pt`, `mm`, `in` | These are scaled units like dp that allow you to specify interface sizes in points (1/72 of an inch), millimeters, or inches. However, we do not recommend using them: not all devices are correctly configured for these units to scale correctly. |
+
+- Attributes whose names do not begin with `layout_` are directions to the widget. When it is inflated, the widget calls a method to configure itself based on each of these attributes and their values. 
+- When an attribute’s name begins with `layout_`, that attribute is a direction to that widget’s parent. These attributes are known as layout parameters, and they tell the parent layout how to arrange the child element within the parent.
+- Margins
+    - Margin attributes are layout parameters. They determine the distance between widgets. Given that a widget can only know about itself, margins must be the responsibility of the widget’s parent.
+- Padding
+    - The android:padding attribute tells the widget how much bigger than its contents it should draw itself.
+
+### Layout Weight
+- The `android:layout_weight` attribute tells the `LinearLayout` how to distribute its children. You have given both widgets the same value, but that does not necessarily make them the same width on screen. To determine the width of its child views, `LinearLayout` uses a mixture of the `layout_width` and `layout_weight` parameters. 
+- `LinearLayout` makes two passes to set the width of a view. 
+    - In the first pass, LinearLayout looks at `layout_width` (or `layout_height`, for vertical orientation).
+    - In the next pass, LinearLayout allocates any extra space based on the values for `layout_weight`
+- What if you want the LinearLayout to allocate exactly 50% of its width to each view? You simply skip the first pass by setting the layout_width of each widget to 0dp instead of wrap_content. This leaves layout_weight the sole component in the LinearLayout’s decision making
+- **remember that a widget must have the same `android:id` attribute in every layout in which it appears so that your code can find it.**
+
+
 
 * * * 
 
@@ -243,6 +274,8 @@ For now, think of hosting as the activity providing a spot in its view hierarchy
 | **intent** | An `intent` is an object that a component can use to communicate with the OS. Intents are multi-purpose communication tools, and the Intent class provides different constructors depending on what you are using the intent to do. |
 | **layout** | A layout defines a set of user interface objects and their position on the screen. A layout is made up of definitions written in XML. Each definition is used to create an object that appears on screen, like a button or some text. |
 | **manifest** | The `manifest` is an XML file containing metadata that describes your application to the Android OS. The file is always named `AndroidManifest.xml`, and it lives in the `app/manifests` directory of your project. |
+| **style** | A `style` is an XML resource that contains attributes that describe how a widget should look and behave. |
+| **theme** | A `theme` is a collection of styles. Structurally, a theme is itself a style resource whose attributes point to other style resources. |
 | **toast** | A *toast* is a short message that informs the user of something but does not require any input or action. |
 | **widget** | Widgets are the building blocks you use to compose a user interface. A widget can show text or graphics, interact with the user, or arrange other widgets on the screen. |
 | **FrameLayout** | FrameLayout is the simplest ViewGroup and does not arrange its children in any particular manner. |
