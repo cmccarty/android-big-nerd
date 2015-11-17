@@ -20,6 +20,16 @@ I started late, so you won't see any commits / tags for the first few chapters.
 # Notes
 (I may move this to a "notes" directory with more structure. But I'll throw it all here to avoid pre-optimizations).
 
+- [Chapter 1: Your First Android Application](#chapter-1-your-first-android-application)
+- [Chapter 2: Android and the Model-View-Controller](#chapter-2-android-and-the-model-view-controller)
+- [Chapter 3: The Activity Lifecycle](#chapter-3-the-activity-lifecycle)
+- [Chapter 4: Debugging Android Apps](#chapter-4-debugging-android-apps)
+- [Chapter 5: Your Second Activity](#chapter-5-your-second-activity)
+- [Chapter 6: Android SDK Versions and Compatibility](#chapter-6-android-sdk-versions-and-compatibility)
+- [Chapter 7: UI Fragments and the Fragment Manager](#chapter-7-ui-fragments-and-the-fragment-manager)
+- [Glossary](#glossary)
+
+
 ## Chapter 1: Your First Android Application
 - An *activity* is an instance of Activity, a class in the Android SDK. An activity is responsible for managing user interaction with a screen of information.
 - A *layout* defines a set of user interface objects and their position on the screen. A layout is made up of definitions written in XML. Each definition is used to create an object that appears on screen, like a button or some text.
@@ -167,7 +177,7 @@ The `Build.VERSION.SDK_INT` constant is the device’s version of Android. You t
 Version codes are listed at [http://developer.android.com/reference/android/os/Build.VERSION_CODES.html](http://developer.android.com/reference/android/os/Build.VERSION_CODES.html).
 
 
-## Chapter 7: UI Fragments and the Fragment Manager
+## Chapter 7 UI Fragments and the Fragment Manager
 ### Introducing Fragments
 A `fragment` is a controller object that an activity can deputize to perform tasks. Most commonly, the task is managing a user interface. The user interface can be an entire screen or just one part of the screen. A fragment managing a user interface is known as a `UI fragment`. A UI fragment has a view of its own that is inflated from a layout file. The fragment’s view contains the interesting UI elements that the user wants to see and interact with. The activity’s view contains a spot where the fragment’s view will be inserted. Or it might have several spots for the views of several fragments.
 
