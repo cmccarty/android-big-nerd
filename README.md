@@ -167,6 +167,59 @@ The `Build.VERSION.SDK_INT` constant is the device’s version of Android. You t
 Version codes are listed at [http://developer.android.com/reference/android/os/Build.VERSION_CODES.html](http://developer.android.com/reference/android/os/Build.VERSION_CODES.html).
 
 
+## Chapter 7: UI Fragments and the Fragment Manager
+### Introducing Fragments
+A `fragment` is a controller object that an activity can deputize to perform tasks. Most commonly, the task is managing a user interface. The user interface can be an entire screen or just one part of the screen. A fragment managing a user interface is known as a `UI fragment`. A UI fragment has a view of its own that is inflated from a layout file. The fragment’s view contains the interesting UI elements that the user wants to see and interact with. The activity’s view contains a spot where the fragment’s view will be inserted. Or it might have several spots for the views of several fragments.
+
+Using UI fragments separates the UI of your app into building blocks; achieving this UI flexibility comes at a cost: more complexity, more moving parts, and more code.
+
+For now, think of hosting as the activity providing a spot in its view hierarchy where the fragment can place its view (Figure   7.5). A fragment is incapable of getting a view on screen itself. Only when it is placed in an activity’s hierarchy will its view appear.
+
+### Support Library
+- The support library includes a complete implementation of fragments that work all the way back to API level 4.
+- Using fragments requires activities that know how to manage fragments. The `FragmentActivity` class knows how to manage the support version of fragments.
+- Maven coordinates format: `groupId`:`artifactId`:`version`
+
+### Hosting a UI Fragment
+- To host a UI fragment, an activity must:
+    - define a spot in its layout for the fragment’s view 
+    - manage the lifecycle of the fragment instance
+- Because a fragment works on behalf of an activity, its state should reflect the activity’s state. **One critical difference between the fragment lifecycle and the activity lifecycle** is that fragment lifecycle methods are called by the hosting activity, not the OS. The OS knows nothing about the fragments that an activity is using to manage things. Fragments are the activity’s internal business.
+- You have two options when it comes to hosting a UI fragment in an activity: 
+    - add the fragment to the activity’s layout (*layout fragment*): It is simple but inflexible. If you add the fragment to the activity’s layout, you hardwire the fragment and its view to the activity’s view and cannot swap out that fragment during the activity’s lifetime.
+    - add the fragment in the activity’s code: More complex, but it is the only way to have control at runtime over your fragments. You determine when the fragment is added to the activity and what happens to it after that. You can remove the fragment, replace it with another, and then add the first fragment back again.
+- to achieve real UI flexibility you must add your fragment in code.
+
+### Creating a UI Fragment
+- The steps to creating a UI fragment are the same as those you followed to create an activity: 
+    - compose a user interface by defining widgets in a layout file 
+    - create the class and set its view to be the layout that you defined 
+    - wire up the widgets inflated from the layout in code
+- In `Fragment.onCreate(…)` you do not inflate the fragment’s view. You configure the fragment instance in `Fragment.onCreate(…)`, but you create and configure the fragment’s view in another fragment lifecycle method: `public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)`
+    - This method is where you inflate the layout for the fragment’s view and return the inflated View to the hosting activity. The `LayoutInflater` and `ViewGroup` parameters are necessary to inflate the layout. The `Bundle` will contain data that this method can use to recreate the view from a saved state.
+- Within `onCreateView(…)`, you explicitly inflate the fragment’s view by calling `LayoutInflater.inflate(…)` and passing in the layout resource ID. The second parameter is your view’s parent, which is usually needed to configure the widgets properly. The third parameter tells the layout inflater whether to add the inflated view to the view’s parent. You pass in `false` because you will add the view in the activity’s code.
+- Getting references in `Fragment.onCreateView(…)` works nearly the same as in `Activity.onCreate(…)`. The only difference is that you call `View.findViewById( int)` on the fragment’s view. The `Activity.findViewById( int)` method that you used before is a convenience method that calls `View.findViewById( int)` behind the scenes. The Fragment class does not have a corresponding convenience method, so you have to call the real thing.
+
+### Adding a UI Fragment to the FragmentManager
+- The FragmentManager is responsible for managing your fragments and adding their views to the activity’s view hierarchy. It handles 2 things: 1) a list of fragments; 2) a back stack of fragment transactions
+- To add a fragment to an activity in code, you make explicit calls to the activity’s FragmentManager.
+- Fragment transactions are used to add, remove, attach, detach, or replace fragments in the fragment list. They are the heart of how you use fragments to compose and recompose screens at runtime. The FragmentManager maintains a back stack of fragment transactions that you can navigate.
+- The FragmentManager.beginTransaction() method creates and returns an instance of FragmentTransaction. The FragmentTransaction class uses a fluent interface - methods that configure FragmentTransaction return a FragmentTransaction instead of void, which allows you to chain them together.
+    - `fm.beginTransaction().add(R.id.fragment_container, fragment).commit();`
+- A container view ID serves two purposes: 
+    - It tells the FragmentManager where in the activity’s view the fragment’s view should appear. 
+    - It is used as a unique identifier for a fragment in the FragmentManager’s list.
+
+#### The FragmentManager and the fragment lifecycle
+- The `FragmentManager` of an activity is responsible for calling the lifecycle methods of the fragments in its list. The `onAttach(Activity)`, `onCreate(Bundle)`, and `onCreateView(…)` methods are called when you add the fragment to the FragmentManager.
+- If you add a fragment while the activity is already running, `FragmentManager` immediately walks the fragment through whatever steps are necessary to get it caught up to the activity’s state.
+
+### Application Architecture with Fragments
+- Fragments are intended to encapsulate major components in a reusable way. A major component in this case would be on the level of an entire screen of your application. If you have a significant number of fragments on screen at once, your code will be littered with fragment transactions and unclear responsibility. A better architectural solution for reuse with smaller components is to extract them into a custom view
+- **A good rule of thumb is to have no more than two or three fragments on the screen at a time**
+
+
+
 * * * 
 
 ## Glossary
@@ -176,6 +229,7 @@ Version codes are listed at [http://developer.android.com/reference/android/os/B
 | ---- | ---- |
 | **activity** | An activity is an instance of Activity, a class in the Android SDK. An activity is responsible for managing user interaction with a screen of information. |
 | **extra** | `Extras` are arbitrary data that the calling activity can include with an intent |
+| **fragment** | A `fragment` is a controller object that an activity can deputize to perform tasks, most commonly managing a user interface |
 | **intent** | An `intent` is an object that a component can use to communicate with the OS. Intents are multi-purpose communication tools, and the Intent class provides different constructors depending on what you are using the intent to do. |
 | **layout** | A layout defines a set of user interface objects and their position on the screen. A layout is made up of definitions written in XML. Each definition is used to create an object that appears on screen, like a button or some text. |
 | **manifest** | The `manifest` is an XML file containing metadata that describes your application to the Android OS. The file is always named `AndroidManifest.xml`, and it lives in the `app/manifests` directory of your project. |
