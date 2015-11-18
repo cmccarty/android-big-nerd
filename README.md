@@ -28,6 +28,7 @@ I started late, so you won't see any commits / tags for the first few chapters.
 - [Chapter 6: Android SDK Versions and Compatibility](#chapter-6-android-sdk-versions-and-compatibility)
 - [Chapter 7: UI Fragments and the Fragment Manager](#chapter-7-ui-fragments-and-the-fragment-manager)
 - [Chapter 8: Creating User Interfaces with Layouts and Widgets](#chapter-8-creating-user-interfaces-with-layouts-and-widgets)
+- [Chapter 9: Displaying Lists with RecyclerView](#chapter-9-displaying-lists-with-recyclerview)
 - [Glossary](#glossary)
 
 
@@ -258,6 +259,43 @@ Android design guidelines: [http://developer.android.com/design/index.html](http
     - In the next pass, LinearLayout allocates any extra space based on the values for `layout_weight`
 - What if you want the LinearLayout to allocate exactly 50% of its width to each view? You simply skip the first pass by setting the layout_width of each widget to 0dp instead of wrap_content. This leaves layout_weight the sole component in the LinearLayout’s decision making
 - **remember that a widget must have the same `android:id` attribute in every layout in which it appears so that your code can find it.**
+
+
+## Chapter 9: Displaying Lists with RecyclerView
+### Recycler View, Adapter, and ViewHolder
+- `RecyclerView` is a subclass of `ViewGroup`. It displays a list of child `View` objects, one for each item in your list of items. Depending on the complexity of what you need to display, these child Views can be complex or very simple.
+- Instead of creating 100 Views, it creates 12 – enough to fill the screen. When a view is scrolled off the screen, RecyclerView reuses it rather than throwing it away. In short, it lives up to its name: it recycles views over and over.
+- The `RecyclerView`’s only responsibilities are recycling TextViews and positioning them on the screen. To get the `TextViews` in the first place, it works with two classes that you will build in a moment: an `Adapter` subclass and a `ViewHolder` subclass.
+- A `RecyclerView` never creates Views by themselves. It always creates `ViewHolders`, which bring their `itemViews` along for the ride
+
+#### Adapters
+- `RecyclerView` does not create `ViewHolders` itself. Instead, it asks an `adapter`. An adapter is a controller object that sits between the RecyclerView and the data set that the RecyclerView should display.
+- The adapter is responsible for:
+    - creating the necessary ViewHolders
+    - binding ViewHolders to data from the model layer
+- First, the RecyclerView asks how many objects are in the list by calling the adapter’s `getItemCount()` method. 
+- Then the RecyclerView calls the adapter’s `createViewHolder(ViewGroup, int)` method to create a new ViewHolder, along with its juicy payload: a `View` to display.
+- Finally, the RecyclerView calls `onBindViewHolder(ViewHolder, int)`. The RecyclerView will pass a ViewHolder into this method along with the position. The adapter will look up the model data for that position and bind it to the ViewHolder’s View. To bind it, the adapter fills in the View to reflect the data in the model object.
+- Note that `createViewHolder(ViewGroup, int)` will happen a lot less often than `onBindViewHolder(ViewHolder, int)`. Once a sufficient number of ViewHolders have been created, RecyclerView stops calling `createViewHolder(…)`. Instead, it saves time and memory by recycling old ViewHolders.
+
+#### Using Recycler View
+- RecyclerView does not do the job of positioning items on the screen itself. It delegates that out to the LayoutManager. The LayoutManager handles the positioning of items and also defines the scrolling behavior.
+- You will use the LinearLayoutManager, which will position the items in the list vertically. Later on in this book, you will use GridLayoutManager to arrange items in a grid instead.
+
+#### Implementing an Adapter and ViewHolder
+- `onCreateViewHolder` is called by the `RecyclerView` when it needs a new View to display an item. In this method, you create the `View` and wrap it in a `ViewHolder`. The `RecyclerView` does not expect that you will hook it up to any data yet.
+- Next, `onBindViewHolder`: This method will bind a `ViewHolder`’s View to your model object. It receives the `ViewHolder` and a position in your data set. To bind your View, you use that position to find the right model data. Then you update the View to reflect that model data.
+
+### Customizing List Items
+- In a `RelativeLayout`, you use layout parameters to arrange child views relative to the root layout and to each other.
+- In a layout file, an ID must be defined with an `@+id` before other widgets can use that ID in their own definitions with `@id`.
+
+### Using a custom item view
+- Calls to findViewById(int) are often expensive, `ViewHolder` can relieve a lot of this pain. By stashing the results of these `findViewById(int)` calls, you only have to spend that time in `createViewHolder(…)`. When `onBindViewHolder(…)` is called, the work is already done. Which is nice, because `onBindViewHolder(…)` is called much more often than `onCreateViewHolder(…)`.
+
+### For the More Curious: ListView and GridView 
+- The core Android OS includes `ListView`, `GridView`, and `Adapter` classes.
+- Another key feature of `RecyclerView` is the animation of items in the list. Animating the addition or removal of items in a `ListView` or `GridView` is a complex and error-prone task. `RecyclerView` makes this much easier, includes a few built-in animations, and allows for easy customization of these animations.
 
 
 
