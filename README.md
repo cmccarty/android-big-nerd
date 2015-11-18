@@ -29,6 +29,7 @@ I started late, so you won't see any commits / tags for the first few chapters.
 - [Chapter 7: UI Fragments and the Fragment Manager](#chapter-7-ui-fragments-and-the-fragment-manager)
 - [Chapter 8: Creating User Interfaces with Layouts and Widgets](#chapter-8-creating-user-interfaces-with-layouts-and-widgets)
 - [Chapter 9: Displaying Lists with RecyclerView](#chapter-9-displaying-lists-with-recyclerview)
+- [Chapter 10: Using Fragment Arguments](#chapter-10-using-fragment-arguments)
 - [Glossary](#glossary)
 
 
@@ -296,6 +297,39 @@ Android design guidelines: [http://developer.android.com/design/index.html](http
 ### For the More Curious: ListView and GridView 
 - The core Android OS includes `ListView`, `GridView`, and `Adapter` classes.
 - Another key feature of `RecyclerView` is the animation of items in the list. Animating the addition or removal of items in a `ListView` or `GridView` is a complex and error-prone task. `RecyclerView` makes this much easier, includes a few built-in animations, and allows for easy customization of these animations.
+
+
+## Chapter 10: Using Fragment Arguments
+### Starting an Activity from a Fragment
+- Starting an activity from a fragment works nearly the same as starting an activity from another activity. You call the `Fragment.startActivity(Intent)` method, which calls the corresponding `Activity` method behind the scenes.
+- Having the fragment access the intent that belongs to the hosting activity makes for simple code. However, it costs you the encapsulation of your fragment.
+
+### Fragment Arguments
+- Every fragment instance can have a `Bundle` object attached to it. This bundle contains key-value pairs that work just like the intent extras of an `Activity`. Each pair is known as an `argument`.
+
+```
+Bundle args = new Bundle(); 
+args.putSerializable(EXTRA_MY_OBJECT, myObject); 
+args.putInt(EXTRA_MY_INT, myInt); 
+args.putCharSequence(EXTRA_MY_STRING, myString);
+```
+
+#### Attaching arguments to a fragment 
+- To attach the arguments bundle to a fragment, you call `Fragment.setArguments(Bundle)`. Attaching arguments to a fragment must be done after the fragment is created but before it is added to an activity. 
+- To hit this window, Android programmers follow a convention of adding a static method named `newInstance()` to the `Fragment` class. This method creates the fragment instance and bundles up and sets its arguments.
+- Hosting activities should know the specifics of how to host their fragments, but fragments should not have to know specifics about their activities. At least, not if you want to maintain the flexibility of independent fragments.
+
+### Reloading the List
+- You can work with the `ActivityManager`’s back stack to reload the list at the right moment. 
+- When `CrimeListFragment` starts an instance of `CrimeActivity`, the CrimeActivity is put on top of the stack. This pauses and stops the instance of `CrimeListActivity` that was initially on top. 
+- When the user presses the Back button to return to the list, the `CrimeActivity` is popped off the stack and destroyed. At that point, the `CrimeListActivity` is started and resumed.
+- In general, `onResume()` is the safest place to take action to update a fragment’s view.
+    - You cannot assume that your activity will be stopped when another activity is in front of it. If the other activity is transparent, your activity may just be paused.
+
+### Getting Results with Fragments
+- Instead of using the Activity’s `startActivityForResult(…)` method, you would use `Fragment.startActivityForResult(…)`. 
+- Instead of overriding `Activity.onActivityResult(…)`, you would override `Fragment.onActivityResult(…)`
+- **A fragment can receive a result from an activity, but it cannot have its own result**. Only activities have results. So while Fragment has its own `startActivityForResult(…)` and `onActivityResult(…)` methods, it does not have any `setResult(…)` methods.
 
 
 
